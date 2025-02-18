@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>PDBe Molstar</title>
+
+    <!-- Molstar CSS & JS -->
+    <link rel="stylesheet" type="text/css" href="https://pdbe-molstar.csb.app/build/pdbe-molstar.css">
+    <script type="text/javascript" src="https://pdbe-molstar.csb.app/build/pdbe-molstar-plugin.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            padding: 30px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap-reverse;
+            gap: 30px;
+        }
+
+        #myViewer {
+            width: 450px;
+            height: 450px;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>PDBe Molstar</h2>
+
+    <div class="content">
+        <div class="viewerSection">
+            <h3>PDBe Mol* JS Plugin Demo</h3>
+            <h4>Control Animation with Slider</h4>
+            
+            <!-- Slider to control animation trigger -->
+            <input type="range" id="animationSlider" min="0" max="10" step="1" value="5">
+            <span id="sliderValue">0</span>
+
+            <!-- Molstar container -->
+            <div id="myViewer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Create plugin instance
+        const viewerInstance = new PDBeMolstarPlugin();
+
+        // Set default options
+        const defaultOptions = {
+            customData: {
+                url: 'file.pdb',
+                format: 'pdb',
+                binary: false,
+            },
+            visualStyle: 'cartoon',
+            hideCanvasControls: ['expand', 'trajectory', 'selection', 'animation', 'controlToggle', 'controlInfo'],
+            hideControls: true,
+            landscape: true,
+            reactive: true
+        };
+
+        const viewerContainer = document.getElementById('myViewer');
+        viewerInstance.render(viewerContainer, defaultOptions);
+
+
+            // Subscribe to loadComplete to add animation and visual updates
+            viewerInstance.events.loadComplete.subscribe(() => {
+                // Find the animation index for "built-in.animate-model-index"
+                const animations = viewerInstance.plugin.managers.animation._animations;
+                const animateModelIndex = animations.findIndex(anim => anim.name === 'built-in.animate-model-index');
+
+                if (animateModelIndex !== -1) {
+                    // Play the animation
+                    const animation = animations[animateModelIndex];
+                    viewerInstance.plugin.managers.animation.play(animation, {
+                        duration: {
+                            name: 'computed',
+                            params: {
+                                targetFps: 30
+                            }
+                        },
+                        mode: {
+                            name: 'once',
+                            params: {
+                                direction: 'forward'
+                            }
+                        }
+                    });
+                }
+            });
+
+    </script>
+</body>
+
+</html>

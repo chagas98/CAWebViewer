@@ -102,6 +102,8 @@
                 <h4>Toggle Spin</h4>
                 <button onclick="viewerInstance.visual.toggleSpin(true)">Rotate</button>
                 <button onclick="viewerInstance.visual.toggleSpin(false)">Stop</button>
+                <button onclick="viewerInstance.visual.toggleRock(true)">RotateRock</button>
+                <button onclick="viewerInstance.visual.toggleRock(false)">StopRock</button>
                 <button onclick="viewerInstance.visual.toggleSpin()">Toggle</button>
 
                 <h4>Focus</h4>
@@ -232,7 +234,7 @@
 
         // Create plugin instance
         const viewerInstance = new PDBeMolstarPlugin();
-
+        
         // Set default options (Checkout available options list in the documentation)
         const defaultOptions = {
             moleculeId: '1hda',

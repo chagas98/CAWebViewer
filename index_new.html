@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>PDBe Molstar</title>
+
+    <!-- Molstar CSS & JS -->
+    <link rel="stylesheet" type="text/css" href="build/pdbe-molstar.css">
+    <script type="text/javascript" src="build/pdbe-molstar-plugin.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            padding: 30px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap-reverse;
+            gap: 30px;
+        }
+
+        #myViewer {
+            width: 450px;
+            height: 450px;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>PDBe Molstar</h2>
+
+    <div class="content">
+        <div class="viewerSection">
+            <h3>PDBe Mol* JS Plugin Demo</h3>
+            <h4>Toggle Spin & Rock</h4>
+            <button id="toggleSpinButton" onclick="toggleSpin()">Toggle Spin</button>
+            <button id="toggleRockButton" onclick="toggleRock()">Toggle Rock</button>
+            <!-- Molstar container -->
+            <div id="myViewer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Create plugin instance
+        const viewerInstance = new PDBeMolstarPlugin();
+
+        // Set default options
+        const defaultOptions = {
+            customData: {
+                url: 'file.pdb',
+                format: 'pdb',
+                binary: false,
+            },
+            visualStyle: 'cartoon',
+            hideCanvasControls: ['expand', 'trajectory', 'selection', 'animation', 'controlToggle', 'controlInfo'],
+            hideControls: true,
+            landscape: true,
+            reactive: true,
+            // expanded: true,
+            // loadMaps: true,
+            // bgColor: 'white',
+            // domainAnnotation: true,
+            // validationAnnotation: true,
+            // symmetryAnnotation: true,
+            // subscribeEvents: true,
+            // loadingOverlay: true
+        };
+        const viewerContainer = document.getElementById('myViewer');
+
+        // Call render method to display the 3D view
+        viewerInstance.render(viewerContainer, defaultOptions);
+
+        // Global flag variables to track the state
+        let isSpinning = false;
+        let isRocking = false;
+
+        // Function to toggle spinning
+        function toggleSpin() {
+            isSpinning = !isSpinning; // Toggle the state
+            viewerInstance.visual.toggleSpin(isSpinning); // Enable or disable spin
+            document.getElementById("toggleSpinButton").innerText = isSpinning ? "Stop Spin" : "Start Spin";
+        }
+
+        // Function to toggle rocking
+        function toggleRock() {
+            isRocking = !isRocking; // Toggle the state
+            viewerInstance.visual.toggleRock(isRocking); // Enable or disable rock
+            document.getElementById("toggleRockButton").innerText = isRocking ? "Stop Rock" : "Start Rock";
+        }
+
+        // Subscribe to loadComplete to add animation and visual updates
+        viewerInstance.events.loadComplete.subscribe(() => {
+            // Find the animation index for "built-in.animate-model-index"
+            const animations = viewerInstance.plugin.managers.animation._animations;
+            const animateModelIndex = animations.findIndex(anim => anim.name === 'built-in.animate-model-index');
+
+            if (animateModelIndex !== -1) {
+                // Play the animation
+                const animation = animations[animateModelIndex];
+                viewerInstance.plugin.managers.animation.play(animation, {
+                    duration: {
+                        name: 'computed',
+                        params: {
+                            targetFps: 30
+                        }
+                    },
+                    mode: {
+                        name: 'once',
+                        params: {
+                            direction: 'forward'
+                        }
+                    }
+                });
+            }
+
+            // Toggle spinning
+            //viewerInstance.visual.toggleSpin(true, true);
+
+            // Update color theme to "sequence-id"
+            const structures = viewerInstance.plugin.managers.structure.hierarchy.current.structures;
+            for (const s of structures) {
+                viewerInstance.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {
+                    color: "sequence-id"
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

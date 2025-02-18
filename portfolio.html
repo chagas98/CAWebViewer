@@ -66,7 +66,7 @@
     }
     /** Return a URL with `params` JSON-encoded in URL parameters (e.g. 'options', 'select', 'skin'...) */
     function linkWithParams(params) {
-      const url = new URL('./index.html', window.location);
+      const url = new URL('./index_new.html', window.location);
       for (const key in params) {
         if (params[key]) {
           url.searchParams.set(key, JSON.stringify(params[key]));
@@ -113,7 +113,12 @@
     const EXAMPLES = {
       'Basic': {
         options: {
-          moleculeId: '1hda',
+           customData: {
+             url: 'file.pdb',
+             format: 'pdb',
+             binary: false,
+           }
+          //moleculeId: '1hda',
           // expanded: true,
           // loadMaps: true,
           // bgColor: {r:255, g:255, b:255},

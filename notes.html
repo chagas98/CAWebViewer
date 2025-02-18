@@ -1,0 +1,30 @@
+let sets = blockJson.sets;
+let selectedSetIndex = 0;
+let inputViewer = new PDBeMolstarPlugin();
+inputViewer.events.loadComplete.subscribe( () => {
+    let animateModelIndex = inputViewer.plugin.managers.animation._animations.findIndex(function(anim) {
+        return anim.name == 'built-in.animate-model-index';
+    });
+    let animation = inputViewer.plugin.managers.animation._animations[0];
+    inputViewer.plugin.managers.animation.play(animation, {
+        duration: {
+            name: 'computed',
+            params: {
+                targetFps: 30
+            }
+        },
+        mode: {
+            name: 'once',
+            params: {
+                direction: 'forward'
+            }
+        }
+    });
+    inputViewer.visual.toggleSpin(true, true);
+    for (const s of inputViewer.plugin.managers.structure.hierarchy.current.structures) {
+        inputViewer.plugin.managers.structure.component.updateRepresentationsTheme(s.components, {
+            color: "sequence-id"
+        });
+    }
+}
+);
